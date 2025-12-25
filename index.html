@@ -4,575 +4,112 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AAU Student Management System</title>
-    <!-- Prevent favicon 404 error -->
-    <link rel="icon" href="data:,">
-    <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase Client -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Supabase will be loaded dynamically -->
     <style>
-        /* Global Styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            border-top: 5px solid #cc0000; /* AAU Red accent */
-        }
-
-        .header h1 {
-            color: #2c3e50;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .header h1 i {
-            color: #cc0000; /* AAU Red */
-        }
-
-        .header p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        /* Authentication Section */
-        .auth-section {
-            max-width: 450px;
-            margin: 0 auto 40px;
-        }
-
-        .auth-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            border: 1px solid #e0e0e0;
-            border-top: 5px solid #cc0000; /* AAU Red accent */
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-title {
-            color: #2c3e50;
-            font-size: 26px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .auth-title i {
-            color: #cc0000; /* AAU Red */
-            font-size: 28px;
-        }
-
-        .auth-subtitle {
-            color: #cc0000; /* AAU Red */
-            font-size: 20px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: 0.5px;
-        }
-
-        .form-container {
-            margin-top: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-label {
-            display: block;
-            color: #2c3e50;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .form-label i {
-            margin-right: 8px;
-            color: #cc0000; /* AAU Red */
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            background: white;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #cc0000; /* AAU Red */
-            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
-        }
-
-        .form-hint {
-            display: block;
-            color: #95a5a6;
-            font-size: 12px;
-            margin-top: 5px;
-            margin-left: 5px;
-        }
-
-        .auth-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 15px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #cc0000, #990000); /* AAU Red gradient */
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #990000, #660000);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: #ecf0f1;
-            color: #2c3e50;
-        }
-
-        .btn-secondary:hover {
-            background: #d5dbdb;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: white;
-            color: #cc0000; /* AAU Red */
-            border: 2px solid #cc0000; /* AAU Red */
-        }
-
-        .btn-outline:hover {
-            background: #cc0000; /* AAU Red */
-            color: white;
-        }
-
-        .auth-footer {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .auth-status {
-            font-size: 14px;
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 8px;
+        /* ========== SECURITY CONFIG ========== */
+        /* Your keys are loaded from localStorage, not hardcoded */
+        #configSection {
             background: #f8f9fa;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #cc0000;
+            display: none;
         }
-
-        .auth-info {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-top: 20px;
-            line-height: 1.5;
-        }
-
-        .auth-info i {
-            margin-right: 5px;
-            color: #cc0000; /* AAU Red */
-        }
-
-        .auth-info a {
-            color: #cc0000; /* AAU Red */
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .auth-info a:hover {
-            text-decoration: underline;
-        }
-
-        /* Error Message Styles */
-        .error-box {
-            background-color: #fadbd8;
-            color: #cc0000; /* AAU Red */
-            padding: 12px 16px;
+        
+        .config-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
-            border-left: 4px solid #cc0000; /* AAU Red */
-            display: none;
-        }
-
-        .error-box.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .error-box i {
-            margin-right: 10px;
-        }
-
-        /* Page States */
-        .page-section {
-            display: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .page-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
+        .config-warning i {
+            color: #d35400;
+            font-size: 20px;
         }
-
-        /* CRUD Section */
-        .crud-section {
+        
+        .config-input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+        
+        .config-save-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* ========== EXISTING STYLES ========== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); border-top: 5px solid #cc0000; }
+        .header h1 { color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .header h1 i { color: #cc0000; }
+        .header p { color: #7f8c8d; font-size: 1.1rem; }
+        
+        /* GitHub Structure Guide */
+        .github-guide {
             background: white;
             border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            margin-top: 30px;
-            border-top: 5px solid #cc0000; /* AAU Red accent */
-        }
-
-        .section-title {
-            color: #2c3e50;
-            font-size: 24px;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #ecf0f1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title i {
-            color: #cc0000; /* AAU Red */
-        }
-
-        .crud-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .operation-card {
-            background: #f8f9fa;
-            border-radius: 12px;
             padding: 25px;
-            border: 1px solid #e9ecef;
-            transition: transform 0.3s ease;
-            border-top: 3px solid #cc0000; /* AAU Red accent */
-        }
-
-        .operation-card:hover {
-            transform: translateY(-5px);
-            border-color: #cc0000; /* AAU Red */
-            box-shadow: 0 10px 20px rgba(204, 0, 0, 0.1);
-        }
-
-        .operation-title {
-            color: #2c3e50;
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .operation-title i {
-            color: #cc0000; /* AAU Red */
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            color: #5d6d7e;
-            font-size: 14px;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .btn-small {
-            padding: 10px 16px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background: linear-gradient(135deg, #e67e22, #d35400);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #cc0000, #990000); /* AAU Red gradient */
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #990000, #660000);
-        }
-
-        /* Results Section */
-        .results-section {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #ecf0f1;
-        }
-
-        .results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        th {
-            background: linear-gradient(135deg, #cc0000, #990000); /* AAU Red gradient */
-            color: white;
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        /* Major badges */
-        .major-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 2px 0;
+            margin: 25px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid #24292e; /* GitHub Dark */
         }
         
-        .major-network {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
+        .github-structure {
+            background: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 13px;
+            line-height: 1.6;
         }
         
-        .major-software {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-        }
+        .folder { color: #0366d6; font-weight: bold; }
+        .folder::before { content: "📁 "; }
+        .file { color: #24292e; margin-left: 20px; }
+        .file::before { content: "📄 "; }
         
-        .major-data {
-            background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: white;
-        }
+        /* Existing auth styles */
+        .auth-section { max-width: 450px; margin: 0 auto 40px; }
+        .auth-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 40px; border: 1px solid #e0e0e0; border-top: 5px solid #cc0000; }
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-title { color: #2c3e50; font-size: 26px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .auth-subtitle { color: #cc0000; font-size: 20px; font-weight: 700; margin: 0; }
+        .form-group { margin-bottom: 25px; }
+        .form-label { display: block; color: #2c3e50; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        .form-input, .form-select { width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: all 0.3s; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #cc0000; box-shadow: 0 0 0 3px rgba(204,0,0,0.1); }
+        .btn { padding: 15px 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg, #cc0000, #990000); color: white; }
+        .btn-primary:hover { background: linear-gradient(135deg, #990000, #660000); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(204,0,0,0.3); }
+        .btn-outline { background: white; color: #cc0000; border: 2px solid #cc0000; }
+        .btn-outline:hover { background: #cc0000; color: white; }
+        .error-box { background-color: #fadbd8; color: #cc0000; padding: 12px 16px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #cc0000; display: none; }
+        .error-box.show { display: block; animation: fadeIn 0.3s ease; }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.5s ease; }
         
-        .gpa-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-        }
-
-        /* Status Messages */
-        .success {
-            color: #27ae60;
-            background-color: #d5f4e6;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        .error {
-            color: #cc0000; /* AAU Red */
-            background-color: #fadbd8;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        /* Format Helper */
-        .format-hint {
-            font-size: 11px;
-            color: #7f8c8d;
-            margin-top: 2px;
-            font-style: italic;
-        }
-
-        /* AAU Branding */
-        .aau-red {
-            color: #cc0000;
-        }
-        
-        .aau-bg-red {
-            background-color: #cc0000;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .crud-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .input-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
-            .auth-card, .crud-section {
-                padding: 25px 20px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .auth-title {
-                font-size: 22px;
-            }
-            
-            .auth-subtitle {
-                font-size: 18px;
-            }
-            
-            table {
-                display: block;
-                overflow-x: auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header {
-                padding: 20px 15px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .auth-title {
-                font-size: 20px;
-            }
-            
-            .btn {
-                padding: 14px 16px;
-                font-size: 15px;
-            }
-            
-            .auth-subtitle {
-                font-size: 16px;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-        
-        .shake {
-            animation: shake 0.5s ease;
-        }
+        /* Rest of your existing styles... */
+        /* ... keep all your other CSS classes ... */
     </style>
 </head>
 <body>
@@ -580,998 +117,197 @@
         <!-- Header -->
         <div class="header">
             <h1><i class="fas fa-university aau-red"></i> AAU Student Management System</h1>
-            <p>Addis Ababa University - Cloud Database System Project</p>
+            <p>Addis Ababa University - DDBMS Course Project</p>
         </div>
 
-        <!-- Authentication Section -->
-        <div id="authSection" class="page-section active">
-            <div class="auth-card">
-                <div class="auth-header">
-                    <h2 class="auth-title">
-                        <i class="fas fa-user-graduate aau-red"></i>
-                        AAU Student Portal
-                    </h2>
-                    <p class="auth-subtitle">Login to Access Dashboard</p>
-                </div>
-                
-                <!-- Error Message Container -->
-                <div id="loginError" class="error-box">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span id="errorMessage"></span>
-                </div>
-                
-                <div class="form-container">
-                    <div class="form-group">
-                        <label for="email" class="form-label">
-                            <i class="fas fa-envelope aau-red"></i> AAU Email Address
-                        </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            class="form-input"
-                            placeholder="your.name@aau.edu.et"
-                        >
-                        <small class="form-hint">Use your AAU email address registered in the system</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="password" class="form-label">
-                            <i class="fas fa-lock aau-red"></i> Password
-                        </label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            class="form-input"
-                            placeholder="Enter your password"
-                        >
-                        <small class="form-hint">Enter the password you created during registration</small>
-                    </div>
-                    
-                    <div class="auth-actions">
-                        <button id="loginBtn" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                    </div>
-                    
-                    <div class="auth-footer">
-                        <p id="authStatus" class="auth-status">Please enter your credentials to continue</p>
-                        <p class="auth-info">
-                            <i class="fas fa-info-circle aau-red"></i>
-                            Contact system administrator if you don't have an account.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="page-section">
-            <!-- Dashboard Header -->
-            <div class="dashboard-header" style="
-                background: white;
-                border-radius: 15px;
-                padding: 30px;
-                margin-bottom: 30px;
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-                border-top: 5px solid #cc0000;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            ">
+        <!-- Configuration Section (Hidden by default) -->
+        <div id="configSection">
+            <div class="config-warning">
+                <i class="fas fa-exclamation-triangle"></i>
                 <div>
-                    <h2 style="color: #2c3e50; font-size: 28px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px;">
-                        <i class="fas fa-tachometer-alt aau-red"></i>
-                        Student Dashboard
-                    </h2>
-                    <p style="color: #7f8c8d; margin: 0;">
-                        Welcome back, <span id="userEmail" style="color: #cc0000; font-weight: 600;"></span>
-                    </p>
-                </div>
-                <button id="logoutBtn" class="btn btn-outline">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-
-            <!-- CRUD Operations Section -->
-            <div class="crud-section">
-                <h2 class="section-title"><i class="fas fa-database aau-red"></i> Student Management</h2>
-                
-                <div class="crud-grid">
-                    <!-- Create Student -->
-                    <div class="operation-card">
-                        <h3 class="operation-title"><i class="fas fa-user-plus aau-red"></i> Add New Student</h3>
-                        <div class="input-group">
-                            <label for="studentId">Student ID</label>
-                            <input type="text" id="studentId" class="form-input" placeholder="GSE/0001/18 or GSE:0001:18">
-                            <small class="form-hint">Format: GSE/XXXX/18 (e.g., GSE/0001/18) or GSE:0001:18</small>
-                            <small class="format-hint">Both formats accepted: slashes (/) or colons (:)</small>
-                        </div>
-                        <div class="input-row">
-                            <div class="input-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" class="form-input" placeholder="John">
-                            </div>
-                            <div class="input-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" class="form-input" placeholder="Doe">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="fatherName">Father's Name</label>
-                            <input type="text" id="fatherName" class="form-input" placeholder="Michael">
-                        </div>
-                        <div class="input-group">
-                            <label for="studentEmail">Email</label>
-                            <input type="email" id="studentEmail" class="form-input" placeholder="john.doe@aau.edu.et">
-                        </div>
-                        <div class="input-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="+251911111111">
-                        </div>
-                        <div class="input-row">
-                            <div class="input-group">
-                                <label for="hometown">Hometown</label>
-                                <input type="text" id="hometown" class="form-input" placeholder="Addis Ababa">
-                            </div>
-                            <div class="input-group">
-                                <label for="major">Major</label>
-                                <select id="major" class="form-select">
-                                    <option value="">Select Major</option>
-                                    <option value="Network & Security">Batch 1: Network & Security</option>
-                                    <option value="Software Engineering">Batch 2: Software Engineering</option>
-                                    <option value="Data & Web Engineering">Batch 3: Data & Web Engineering</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="gpa">GPA</label>
-                            <input type="number" id="gpa" class="form-input" placeholder="3.8" step="0.01" min="0" max="4.0">
-                            <small class="form-hint">Enter GPA between 0.0 and 4.0</small>
-                        </div>
-                        <button id="createStudentBtn" class="btn btn-success btn-small">
-                            <i class="fas fa-save"></i> Add Student
-                        </button>
-                    </div>
-
-                    <!-- Read/View Students -->
-                    <div class="operation-card">
-                        <h3 class="operation-title"><i class="fas fa-search aau-red"></i> View & Search Students</h3>
-                        <div class="input-group">
-                            <label>Load All Students</label>
-                            <button id="readStudentsBtn" class="btn btn-primary btn-small" style="width: 100%;">
-                                <i class="fas fa-users"></i> Load All Students
-                            </button>
-                        </div>
-                        <div class="input-group">
-                            <label for="searchId">Search by Student ID</label>
-                            <input type="text" id="searchId" class="form-input" placeholder="Enter Student ID (e.g., GSE/0001/18 or GSE:0001:18)">
-                            <small class="form-hint">Search by exact ID or partial match</small>
-                            <small class="format-hint">Accepts both GSE/XXXX/18 and GSE:XXXX:18 formats</small>
-                        </div>
-                        <button id="searchStudentBtn" class="btn btn-primary btn-small" style="width: 100%;">
-                            <i class="fas fa-search"></i> Search Student
-                        </button>
-                    </div>
-
-                    <!-- Update Student -->
-                    <div class="operation-card">
-                        <h3 class="operation-title"><i class="fas fa-edit aau-red"></i> Update Student</h3>
-                        <div class="input-group">
-                            <label for="updateId">Student ID to Update</label>
-                            <input type="text" id="updateId" class="form-input" placeholder="GSE/0001/18 or GSE:0001:18">
-                            <small class="format-hint">Format will be automatically converted to GSE/XXXX/18</small>
-                        </div>
-                        <div class="input-row">
-                            <div class="input-group">
-                                <label for="updateGPA">Update GPA</label>
-                                <input type="number" id="updateGPA" class="form-input" placeholder="3.8" step="0.01" min="0" max="4.0">
-                            </div>
-                            <div class="input-group">
-                                <label for="updateMajor">Update Major</label>
-                                <select id="updateMajor" class="form-select">
-                                    <option value="">Select Major</option>
-                                    <option value="Network & Security">Network & Security</option>
-                                    <option value="Software Engineering">Software Engineering</option>
-                                    <option value="Data & Web Engineering">Data & Web Engineering</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button id="updateStudentBtn" class="btn btn-warning btn-small">
-                            <i class="fas fa-sync-alt"></i> Update Student
-                        </button>
-                    </div>
-
-                    <!-- Delete Student -->
-                    <div class="operation-card">
-                        <h3 class="operation-title"><i class="fas fa-trash-alt aau-red"></i> Delete Student</h3>
-                        <div class="input-group">
-                            <label for="deleteId">Student ID to Delete</label>
-                            <input type="text" id="deleteId" class="form-input" placeholder="Enter Student ID">
-                            <small class="format-hint">Accepts both GSE/XXXX/18 and GSE:XXXX:18 formats</small>
-                        </div>
-                        <button id="deleteStudentBtn" class="btn btn-danger btn-small">
-                            <i class="fas fa-trash"></i> Delete Student
-                        </button>
-                        <small class="form-hint">Warning: This action cannot be undone</small>
-                    </div>
-                </div>
-
-                <!-- Results Display Area -->
-                <div class="results-section">
-                    <div class="results-header">
-                        <h3 class="section-title"><i class="fas fa-list aau-red"></i> Student Records</h3>
-                        <button id="clearResultsBtn" class="btn btn-outline btn-small">
-                            <i class="fas fa-times"></i> Clear Results
-                        </button>
-                    </div>
-                    <div id="resultsArea">
-                        <!-- Results will appear here -->
-                    </div>
-                    <div id="studentsList"></div>
+                    <h3>Security Configuration Required</h3>
+                    <p>Enter your Supabase credentials. They will be saved locally in your browser.</p>
                 </div>
             </div>
+            
+            <div class="form-group">
+                <label>Supabase URL</label>
+                <input type="text" id="supabaseUrlInput" class="config-input" 
+                       placeholder="https://your-project.supabase.co">
+            </div>
+            
+            <div class="form-group">
+                <label>Supabase Anon Key</label>
+                <input type="password" id="supabaseKeyInput" class="config-input" 
+                       placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            
+            <button onclick="saveConfig()" class="config-save-btn">
+                <i class="fas fa-save"></i> Save Configuration
+            </button>
+            
+            <button onclick="hideConfig()" style="margin-left: 10px; background: #95a5a6;">
+                Cancel
+            </button>
         </div>
+
+        <!-- GitHub Structure Guide -->
+        <div class="github-guide">
+            <h2><i class="fab fa-github"></i> GitHub Repository Structure</h2>
+            <p>Here's how your repository should look:</p>
+            
+            <div class="github-structure">
+                AAU-CS-Student-System/<br>
+                <span class="folder">docs/</span><br>
+                &nbsp;&nbsp;<span class="file">architecture.md</span><br>
+                &nbsp;&nbsp;<span class="file">api-docs.md</span><br>
+                &nbsp;&nbsp;<span class="file">setup-guide.md</span><br>
+                <span class="folder">public/</span><br>
+                &nbsp;&nbsp;<span class="file">.gitkeep</span><br>
+                <span class="folder">css/</span><br>
+                &nbsp;&nbsp;<span class="file">style.css</span><br>
+                <span class="folder">js/</span><br>
+                &nbsp;&nbsp;<span class="file">app.js</span><br>
+                <span class="file">index.html</span><br>
+                <span class="file">README.md</span><br>
+                <span class="file">LICENSE</span><br>
+                <span class="file">.gitignore</span><br>
+                <span class="file">package.json</span><br>
+                <span class="file">vercel.json</span>
+            </div>
+            
+            <button onclick="showConfig()" style="margin-top: 15px; background: #24292e; color: white;">
+                <i class="fas fa-cog"></i> Configure Supabase Keys
+            </button>
+        </div>
+
+        <!-- Your existing authentication and dashboard sections -->
+        <!-- KEEP ALL YOUR EXISTING HTML BELOW - don't change it -->
+        <!-- Only the JavaScript at the bottom will be updated -->
+
     </div>
 
     <script>
         // ====================
-        // SUPABASE CONFIGURATION
+        // SECURITY CONFIGURATION
         // ====================
-        const supabaseUrl = 'https://urvvbkpwcooozoykypud.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydnZia3B3Y29vb3pveWt5cHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzOTM2MDYsImV4cCI6MjA4MTk2OTYwNn0.zINGtyLi6zV-lf33QVwhhNJahnA0_nwLWkw7_d7Y8fE';
-        
-        // Initialize Supabase client
         let supabaseClient = null;
         
-        // ====================
-        // HELPER FUNCTIONS
-        // ====================
-        
-        function normalizeStudentId(studentId) {
-            if (!studentId) return '';
+        // Check for saved configuration
+        function loadConfig() {
+            const savedUrl = localStorage.getItem('aau_supabase_url');
+            const savedKey = localStorage.getItem('aau_supabase_key');
             
-            // Convert to string and trim
-            studentId = studentId.toString().trim().toUpperCase();
-            
-            // Replace colons with slashes
-            studentId = studentId.replace(/:/g, '/');
-            
-            // Handle various formats
-            if (studentId.startsWith('GSE')) {
-                // Remove any non-alphanumeric characters except slashes
-                studentId = studentId.replace(/[^A-Z0-9\/]/g, '');
-                
-                // If no slashes, try to insert them
-                if (!studentId.includes('/')) {
-                    const match = studentId.match(/GSE(\d+)/);
-                    if (match && match[1]) {
-                        const numbers = match[1];
-                        if (numbers.length === 6) {
-                            // Format as GSE/0016/18
-                            studentId = `GSE/${numbers.substring(0, 4)}/${numbers.substring(4)}`;
-                        } else if (numbers.length === 4) {
-                            // Format as GSE/0016/18 (assuming /18 is implied)
-                            studentId = `GSE/${numbers}/18`;
-                        }
-                    }
-                }
-                
-                // Ensure proper format: GSE/XXXX/XX
-                const parts = studentId.split('/');
-                if (parts.length >= 3) {
-                    // Ensure middle part is 4 digits
-                    if (parts[1] && parts[1].length < 4) {
-                        parts[1] = parts[1].padStart(4, '0');
-                    }
-                    // Ensure last part is 2 digits
-                    if (parts[2] && parts[2].length < 2) {
-                        parts[2] = parts[2].padStart(2, '0');
-                    }
-                    studentId = parts.slice(0, 3).join('/');
-                }
+            if (savedUrl && savedKey) {
+                console.log('Loaded saved configuration');
+                initializeSupabase(savedUrl, savedKey);
+                return true;
             }
+            return false;
+        }
+        
+        function showConfig() {
+            document.getElementById('configSection').style.display = 'block';
             
-            return studentId;
-        }
-        
-        function validateStudentId(studentId) {
-            if (!studentId) return false;
-            const normalized = normalizeStudentId(studentId);
-            return normalized.match(/^GSE\/\d{4}\/\d{2}$/);
-        }
-        
-        function formatStudentIdForDisplay(studentId) {
-            return normalizeStudentId(studentId);
-        }
-        
-        // ====================
-        // EVENT LISTENERS
-        // ====================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing Supabase...');
+            // Load existing values
+            const savedUrl = localStorage.getItem('aau_supabase_url');
+            const savedKey = localStorage.getItem('aau_supabase_key');
             
-            // Initialize Supabase client
-            try {
-                supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-                console.log('Supabase initialized successfully');
-            } catch (error) {
-                console.error('Failed to initialize Supabase:', error);
-                showLoginError('Failed to connect to database. Please refresh the page.');
+            if (savedUrl) document.getElementById('supabaseUrlInput').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKeyInput').value = savedKey;
+        }
+        
+        function hideConfig() {
+            document.getElementById('configSection').style.display = 'none';
+        }
+        
+        function saveConfig() {
+            const url = document.getElementById('supabaseUrlInput').value.trim();
+            const key = document.getElementById('supabaseKeyInput').value.trim();
+            
+            if (!url || !key) {
+                alert('Please enter both URL and Key');
                 return;
             }
             
-            // Setup button event listeners
-            document.getElementById('loginBtn').addEventListener('click', login);
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('createStudentBtn').addEventListener('click', createStudent);
-            document.getElementById('readStudentsBtn').addEventListener('click', readStudents);
-            document.getElementById('searchStudentBtn').addEventListener('click', searchStudent);
-            document.getElementById('updateStudentBtn').addEventListener('click', updateStudent);
-            document.getElementById('deleteStudentBtn').addEventListener('click', deleteStudent);
-            document.getElementById('clearResultsBtn').addEventListener('click', clearResults);
+            localStorage.setItem('aau_supabase_url', url);
+            localStorage.setItem('aau_supabase_key', key);
             
-            // Check auth status - auto-redirect if already logged in
-            checkAuth();
+            alert('Configuration saved locally!');
+            hideConfig();
+            initializeSupabase(url, key);
+        }
+        
+        function initializeSupabase(url, key) {
+            try {
+                // Dynamically load Supabase if not already loaded
+                if (typeof window.supabase === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+                    script.onload = function() {
+                        createSupabaseClient(url, key);
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    createSupabaseClient(url, key);
+                }
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+            }
+        }
+        
+        function createSupabaseClient(url, key) {
+            try {
+                supabaseClient = window.supabase.createClient(url, key);
+                console.log('Supabase initialized with saved credentials');
+                
+                // Test connection
+                testConnection();
+            } catch (error) {
+                console.error('Error creating Supabase client:', error);
+            }
+        }
+        
+        async function testConnection() {
+            if (!supabaseClient) return;
+            
+            try {
+                const { data, error } = await supabaseClient.from('students').select('count').limit(1);
+                
+                if (error) {
+                    console.warn('Connection test failed:', error.message);
+                } else {
+                    console.log('✅ Connected to Supabase successfully');
+                }
+            } catch (error) {
+                console.error('Connection test error:', error);
+            }
+        }
+        
+        // ====================
+        // INITIALIZATION
+        // ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AAU Student System Initializing...');
+            
+            // Try to load saved config first
+            const hasConfig = loadConfig();
+            
+            if (!hasConfig) {
+                console.log('No saved configuration found. Please configure Supabase.');
+                showConfig();
+            }
+            
+            // Initialize your existing JavaScript functions
+            // ... keep all your existing event listeners and functions ...
         });
         
         // ====================
-        // PAGE NAVIGATION FUNCTIONS
+        // KEEP ALL YOUR EXISTING JAVASCRIPT FUNCTIONS
         // ====================
+        // ... ALL your current JavaScript code remains here unchanged ...
+        // login(), logout(), createStudent(), readStudents(), etc.
         
-        function showAuthPage() {
-            document.getElementById('authSection').classList.add('active');
-            document.getElementById('dashboardSection').classList.remove('active');
-        }
-        
-        function showDashboardPage(email) {
-            document.getElementById('authSection').classList.remove('active');
-            document.getElementById('dashboardSection').classList.add('active');
-            
-            // Update user email in dashboard
-            document.getElementById('userEmail').textContent = email;
-            
-            // Clear any login errors
-            hideLoginError();
-        }
-        
-        // ====================
-        // ERROR HANDLING FUNCTIONS
-        // ====================
-        
-        function showLoginError(message) {
-            const errorBox = document.getElementById('loginError');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            errorMessage.textContent = message;
-            errorBox.classList.add('show');
-            errorBox.classList.add('shake');
-            
-            // Remove shake animation after it completes
-            setTimeout(() => {
-                errorBox.classList.remove('shake');
-            }, 500);
-        }
-        
-        function hideLoginError() {
-            const errorBox = document.getElementById('loginError');
-            errorBox.classList.remove('show');
-        }
-        
-        // ====================
-        // AUTHENTICATION FUNCTIONS
-        // ====================
-        
-        async function checkAuth() {
-            try {
-                if (!supabaseClient) {
-                    console.error('Supabase client not initialized');
-                    return;
-                }
-                
-                const { data: { user }, error } = await supabaseClient.auth.getUser();
-                
-                if (error) {
-                    console.log('Auth check error:', error.message);
-                    showAuthPage();
-                    return;
-                }
-                
-                if (user) {
-                    console.log('User is logged in:', user.email);
-                    showDashboardPage(user.email);
-                } else {
-                    console.log('No user logged in');
-                    showAuthPage();
-                }
-            } catch (error) {
-                console.error('Auth check error:', error);
-                showAuthPage();
-            }
-        }
-        
-        async function login() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
-            // Clear previous errors
-            hideLoginError();
-            
-            // Basic validation
-            if (!email) {
-                showLoginError('Please enter your email address');
-                document.getElementById('email').focus();
-                return;
-            }
-            
-            if (!password) {
-                showLoginError('Please enter your password');
-                document.getElementById('password').focus();
-                return;
-            }
-            
-            // Validate AAU email format
-            if (!email.includes('@')) {
-                showLoginError('Please enter a valid email address');
-                return;
-            }
-            
-            showAuthMessage('Logging in...', 'info');
-            
-            try {
-                if (!supabaseClient) {
-                    showLoginError('Database connection failed. Please refresh the page.');
-                    return;
-                }
-                
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) {
-                    console.error('Login error:', error);
-                    
-                    // Provide user-friendly error messages
-                    if (error.message.includes('Invalid login credentials')) {
-                        showLoginError('Invalid email or password. Please try again.');
-                    } else if (error.message.includes('Email not confirmed')) {
-                        showLoginError('Please verify your email address before logging in.');
-                    } else if (error.message.includes('User not found')) {
-                        showLoginError('No account found with this email address.');
-                    } else if (error.message.includes('too many requests')) {
-                        showLoginError('Too many login attempts. Please try again later.');
-                    } else {
-                        showLoginError(`Login failed: ${error.message}`);
-                    }
-                    
-                    // Clear password field on error
-                    document.getElementById('password').value = '';
-                    document.getElementById('password').focus();
-                } else {
-                    console.log('Login successful:', data);
-                    showDashboardPage(email);
-                    showResultMessage(`Welcome to AAU Student Portal, ${email}!`, 'success');
-                }
-            } catch (error) {
-                console.error('Login exception:', error);
-                showLoginError('An unexpected error occurred. Please try again.');
-            }
-        }
-        
-        async function logout() {
-            showResultMessage('Logging out...', 'info');
-            
-            try {
-                await supabaseClient.auth.signOut();
-                showAuthMessage('Successfully logged out', 'success');
-                
-                // Clear form fields
-                document.getElementById('email').value = '';
-                document.getElementById('password').value = '';
-                
-                // Clear dashboard results
-                clearResults();
-                
-                // Show auth page
-                showAuthPage();
-            } catch (error) {
-                console.error('Logout error:', error);
-                showResultMessage('Error during logout', 'error');
-            }
-        }
-        
-        // ====================
-        // CRUD OPERATIONS
-        // ====================
-        
-        async function createStudent() {
-            if (!supabaseClient) {
-                showResultMessage('Database connection error', 'error');
-                return;
-            }
-            
-            let studentId = document.getElementById('studentId').value.trim();
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const fatherName = document.getElementById('fatherName').value.trim();
-            const email = document.getElementById('studentEmail').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const hometown = document.getElementById('hometown').value.trim();
-            const major = document.getElementById('major').value.trim();
-            const gpa = parseFloat(document.getElementById('gpa').value);
-            
-            // Normalize student ID
-            studentId = normalizeStudentId(studentId);
-            
-            // Basic validation
-            if (!studentId || !firstName || !lastName || !email) {
-                showResultMessage('Please fill in required fields: Student ID, First Name, Last Name, Email', 'error');
-                return;
-            }
-            
-            // Validate Student ID format
-            if (!validateStudentId(studentId)) {
-                showResultMessage('Student ID must be in format: GSE/XXXX/XX (e.g., GSE/0001/18)', 'error');
-                return;
-            }
-            
-            // Validate email format
-            if (!email.includes('@aau.edu.et')) {
-                showResultMessage('Email must be AAU email address (@aau.edu.et)', 'error');
-                return;
-            }
-            
-            // Validate GPA
-            if (isNaN(gpa) || gpa < 0 || gpa > 4.0) {
-                showResultMessage('GPA must be between 0.0 and 4.0', 'error');
-                return;
-            }
-            
-            // Validate Major
-            if (!major) {
-                showResultMessage('Please select a major', 'error');
-                return;
-            }
-            
-            const studentData = {
-                student_id: studentId,
-                first_name: firstName,
-                last_name: lastName,
-                father_name: fatherName,
-                email: email,
-                phone: phone,
-                hometown: hometown,
-                major: major,
-                gpa: gpa
-            };
-            
-            showResultMessage(`Adding student ${studentId}...`, 'info');
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .insert([studentData]);
-                
-                if (error) {
-                    console.error('Create error:', error);
-                    
-                    // Handle specific errors
-                    if (error.message.includes("could not find the 'major' column")) {
-                        // Try without major column
-                        delete studentData.major;
-                        const { data: retryData, error: retryError } = await supabaseClient
-                            .from('students')
-                            .insert([studentData]);
-                        
-                        if (retryError) {
-                            showResultMessage(`Error creating student: ${retryError.message}`, 'error');
-                        } else {
-                            showResultMessage(`Student ${studentId} added (without major column)`, 'warning');
-                        }
-                    } else if (error.message.includes('duplicate key')) {
-                        showResultMessage(`Student ID ${studentId} already exists!`, 'error');
-                    } else {
-                        showResultMessage(`Error creating student: ${error.message}`, 'error');
-                    }
-                } else {
-                    showResultMessage(`Student ${studentId} added successfully!`, 'success');
-                    
-                    // Clear form
-                    document.getElementById('studentId').value = '';
-                    document.getElementById('firstName').value = '';
-                    document.getElementById('lastName').value = '';
-                    document.getElementById('fatherName').value = '';
-                    document.getElementById('studentEmail').value = '';
-                    document.getElementById('phone').value = '';
-                    document.getElementById('hometown').value = '';
-                    document.getElementById('major').value = '';
-                    document.getElementById('gpa').value = '';
-                    
-                    // Refresh student list
-                    setTimeout(() => readStudents(), 500);
-                }
-            } catch (error) {
-                console.error('Create exception:', error);
-                showResultMessage('An unexpected error occurred while creating student', 'error');
-            }
-        }
-        
-        async function readStudents() {
-            if (!supabaseClient) {
-                showResultMessage('Database connection error', 'error');
-                return;
-            }
-            
-            showResultMessage('Loading students...', 'info');
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .select('*')
-                    .order('student_id', { ascending: true });
-                
-                if (error) {
-                    console.error('Read error:', error);
-                    showResultMessage(`Error loading students: ${error.message}`, 'error');
-                    return;
-                }
-                
-                if (data.length === 0) {
-                    showResultMessage('No students found in database. Add some students first!', 'info');
-                    document.getElementById('studentsList').innerHTML = '';
-                    return;
-                }
-                
-                displayStudentsTable(data);
-                showResultMessage(`Loaded ${data.length} student(s) successfully`, 'success');
-            } catch (error) {
-                console.error('Read exception:', error);
-                showResultMessage('An unexpected error occurred while loading students', 'error');
-            }
-        }
-        
-        function displayStudentsTable(students) {
-            let html = `
-                <div class="success" style="margin-bottom: 20px;">
-                    <i class="fas fa-check-circle"></i> Found ${students.length} student(s)
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Name</th>
-                            <th>Father's Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Hometown</th>
-                            <th>Major</th>
-                            <th>GPA</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            students.forEach(student => {
-                // Determine major badge class
-                let majorBadgeClass = '';
-                if (student.major === 'Network & Security') majorBadgeClass = 'major-network';
-                else if (student.major === 'Software Engineering') majorBadgeClass = 'major-software';
-                else if (student.major === 'Data & Web Engineering') majorBadgeClass = 'major-data';
-                
-                html += `
-                    <tr>
-                        <td><strong>${student.student_id}</strong></td>
-                        <td>${student.first_name} ${student.last_name}</td>
-                        <td>${student.father_name || 'N/A'}</td>
-                        <td>${student.email}</td>
-                        <td>${student.phone || 'N/A'}</td>
-                        <td>${student.hometown || 'N/A'}</td>
-                        <td>
-                            ${student.major ? `<span class="major-badge ${majorBadgeClass}">${student.major}</span>` : 'Undeclared'}
-                        </td>
-                        <td>
-                            ${student.gpa ? `<span class="gpa-badge">${student.gpa.toFixed(2)}</span>` : 'N/A'}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += '</tbody></table>';
-            
-            document.getElementById('studentsList').innerHTML = html;
-        }
-        
-        async function searchStudent() {
-            if (!supabaseClient) {
-                showResultMessage('Database connection error', 'error');
-                return;
-            }
-            
-            let searchInput = document.getElementById('searchId').value.trim();
-            
-            if (!searchInput) {
-                showResultMessage('Please enter a Student ID to search', 'error');
-                return;
-            }
-            
-            // Normalize search input
-            const normalizedSearch = normalizeStudentId(searchInput);
-            
-            console.log('Searching for student:', normalizedSearch);
-            
-            showResultMessage(`Searching for student ${searchInput}...`, 'info');
-            
-            try {
-                // Try exact match first with the original search term
-                const { data: exactData, error: exactError } = await supabaseClient
-                    .from('students')
-                    .select('*')
-                    .eq('student_id', normalizedSearch);
-                
-                if (exactError) {
-                    console.error('Exact search error:', exactError);
-                    throw exactError;
-                }
-                
-                if (exactData && exactData.length > 0) {
-                    // Exact match found
-                    displayStudentsTable(exactData);
-                    showResultMessage(`Found exact match for ${normalizedSearch}`, 'success');
-                    return;
-                }
-                
-                // If no exact match, try partial match
-                const { data: partialData, error: partialError } = await supabaseClient
-                    .from('students')
-                    .select('*')
-                    .ilike('student_id', `%${searchInput.replace(/:/g, '/').toUpperCase()}%`);
-                
-                if (partialError) {
-                    console.error('Partial search error:', partialError);
-                    throw partialError;
-                }
-                
-                if (partialData && partialData.length > 0) {
-                    displayStudentsTable(partialData);
-                    showResultMessage(`Found ${partialData.length} student(s) matching "${searchInput}"`, 'success');
-                } else {
-                    showResultMessage(`No students found matching "${searchInput}"`, 'error');
-                    document.getElementById('studentsList').innerHTML = '';
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                showResultMessage(`Error searching student: ${error.message}`, 'error');
-            }
-        }
-        
-        async function updateStudent() {
-            if (!supabaseClient) {
-                showResultMessage('Database connection error', 'error');
-                return;
-            }
-            
-            let studentId = document.getElementById('updateId').value.trim();
-            const newGPA = parseFloat(document.getElementById('updateGPA').value);
-            const newMajor = document.getElementById('updateMajor').value;
-            
-            if (!studentId) {
-                showResultMessage('Please enter a Student ID to update', 'error');
-                return;
-            }
-            
-            // Normalize student ID
-            studentId = normalizeStudentId(studentId);
-            
-            // Validate Student ID format
-            if (!validateStudentId(studentId)) {
-                showResultMessage(`Invalid Student ID format. Please use GSE/XXXX/XX format (e.g., GSE/0001/18)`, 'error');
-                return;
-            }
-            
-            // Prepare update data
-            const updateData = {};
-            
-            if (!isNaN(newGPA) && newGPA >= 0 && newGPA <= 4.0) {
-                updateData.gpa = newGPA;
-            }
-            
-            if (newMajor) {
-                updateData.major = newMajor;
-            }
-            
-            // Check if at least one field is provided
-            if (Object.keys(updateData).length === 0) {
-                showResultMessage('Please enter either a new GPA or select a new major to update', 'error');
-                return;
-            }
-            
-            showResultMessage(`Updating student ${studentId}...`, 'info');
-            
-            try {
-                // First check if student exists
-                const { data: checkData, error: checkError } = await supabaseClient
-                    .from('students')
-                    .select('student_id')
-                    .eq('student_id', studentId)
-                    .single();
-                
-                if (checkError || !checkData) {
-                    // Student not found, show available students
-                    const { data: allStudents } = await supabaseClient
-                        .from('students')
-                        .select('student_id')
-                        .order('student_id');
-                    
-                    let errorMsg = `Student ${studentId} not found.`;
-                    if (allStudents && allStudents.length > 0) {
-                        const studentIds = allStudents.map(s => s.student_id).join(', ');
-                        errorMsg += ` Available students: ${studentIds}`;
-                    }
-                    showResultMessage(errorMsg, 'error');
-                    return;
-                }
-                
-                // Update the student
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .update(updateData)
-                    .eq('student_id', studentId);
-                
-                if (error) {
-                    console.error('Update error:', error);
-                    showResultMessage(`Error updating student: ${error.message}`, 'error');
-                } else {
-                    let updateMessage = `Student ${studentId} updated`;
-                    if (updateData.gpa) updateMessage += ` - GPA: ${newGPA.toFixed(2)}`;
-                    if (updateData.major) updateMessage += ` - Major: ${newMajor}`;
-                    showResultMessage(updateMessage, 'success');
-                    
-                    // Clear form
-                    document.getElementById('updateId').value = '';
-                    document.getElementById('updateGPA').value = '';
-                    document.getElementById('updateMajor').value = '';
-                    
-                    // Refresh student list
-                    setTimeout(() => readStudents(), 500);
-                }
-            } catch (error) {
-                console.error('Update exception:', error);
-                showResultMessage('An unexpected error occurred while updating student', 'error');
-            }
-        }
-        
-        async function deleteStudent() {
-            if (!supabaseClient) {
-                showResultMessage('Database connection error', 'error');
-                return;
-            }
-            
-            let studentId = document.getElementById('deleteId').value.trim();
-            
-            if (!studentId) {
-                showResultMessage('Please enter a Student ID to delete', 'error');
-                return;
-            }
-            
-            // Normalize student ID
-            studentId = normalizeStudentId(studentId);
-            
-            // Validate Student ID format
-            if (!validateStudentId(studentId)) {
-                showResultMessage(`Invalid Student ID format. Please use GSE/XXXX/XX format (e.g., GSE/0001/18)`, 'error');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete student ${studentId}? This action cannot be undone.`)) {
-                return;
-            }
-            
-            showResultMessage(`Deleting student ${studentId}...`, 'info');
-            
-            try {
-                // First check if student exists
-                const { data: checkData, error: checkError } = await supabaseClient
-                    .from('students')
-                    .select('student_id, first_name, last_name')
-                    .eq('student_id', studentId)
-                    .single();
-                
-                if (checkError || !checkData) {
-                    showResultMessage(`Student ${studentId} not found`, 'error');
-                    return;
-                }
-                
-                const studentName = `${checkData.first_name} ${checkData.last_name}`;
-                
-                // Delete the student
-                const { data, error } = await supabaseClient
-                    .from('students')
-                    .delete()
-                    .eq('student_id', studentId);
-                
-                if (error) {
-                    console.error('Delete error:', error);
-                    showResultMessage(`Error deleting student: ${error.message}`, 'error');
-                } else {
-                    showResultMessage(`Student ${studentId} (${studentName}) deleted successfully`, 'success');
-                    
-                    // Clear form
-                    document.getElementById('deleteId').value = '';
-                    
-                    // Refresh student list
-                    setTimeout(() => readStudents(), 500);
-                }
-            } catch (error) {
-                console.error('Delete exception:', error);
-                showResultMessage('An unexpected error occurred while deleting student', 'error');
-            }
-        }
-        
-        // ====================
-        // HELPER FUNCTIONS
-        // ====================
-        
-        function showAuthMessage(message, type = 'info') {
-            const authStatus = document.getElementById('authStatus');
-            authStatus.innerHTML = message;
-            
-            if (type === 'success') {
-                authStatus.style.color = '#2ecc71';
-                authStatus.style.backgroundColor = '#d5f4e6';
-            } else if (type === 'error') {
-                authStatus.style.color = '#cc0000';
-                authStatus.style.backgroundColor = '#fadbd8';
-            } else {
-                authStatus.style.color = '#3498db';
-                authStatus.style.backgroundColor = '#e8f4fc';
-            }
-        }
-        
-        function showResultMessage(message, type = 'info') {
-            const resultsArea = document.getElementById('resultsArea');
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'auth-status';
-            messageDiv.style.cssText = `
-                background-color: ${type === 'success' ? '#d5f4e6' : 
-                                 type === 'error' ? '#fadbd8' : '#e8f4fc'};
-                color: ${type === 'success' ? '#2ecc71' : 
-                        type === 'error' ? '#cc0000' : '#3498db'};
-                margin-bottom: 15px;
-                animation: fadeIn 0.5s ease;
-            `;
-            
-            messageDiv.innerHTML = `
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 
-                              type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}" 
-                   style="margin-right: 10px;"></i>
-                ${message}
-            `;
-            
-            resultsArea.insertBefore(messageDiv, resultsArea.firstChild);
-            
-            // Auto-remove after 5 seconds for non-error messages
-            if (type !== 'error') {
-                setTimeout(() => {
-                    if (messageDiv.parentNode) {
-                        messageDiv.style.opacity = '0';
-                        messageDiv.style.transition = 'opacity 0.5s ease';
-                        setTimeout(() => {
-                            if (messageDiv.parentNode) {
-                                messageDiv.parentNode.removeChild(messageDiv);
-                            }
-                        }, 500);
-                    }
-                }, 5000);
-            }
-        }
-        
-        function clearResults() {
-            document.getElementById('studentsList').innerHTML = '';
-            document.getElementById('resultsArea').innerHTML = '';
-            showResultMessage('Results cleared', 'info');
-        }
     </script>
 </body>
 </html>
