@@ -1,0 +1,15 @@
+{
+  "name": "aau-cs-student-system",
+  "version": "1.0.0",
+  "description": "AAU Student Management System - DDBMS Course Project",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000",
+    "deploy": "echo 'Deploy to Vercel'"
+  },
+  "keywords": ["student-management", "aau", "supabase", "education"],
+  "author": "getaye21",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
