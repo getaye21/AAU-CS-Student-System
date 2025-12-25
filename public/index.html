@@ -1,1 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAU Student Management System</title>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Client -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- All CSS in one style tag -->
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid #cc0000;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header h1 i {
+            color: #cc0000;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* ==================== AUTHENTICATION SECTION ==================== */
+        .auth-section {
+            max-width: 450px;
+            margin: 0 auto 40px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border: 1px solid #e0e0e0;
+            border-top: 5px solid #cc0000;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title {
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .auth-title i {
+            color: #cc0000;
+            font-size: 28px;
+        }
+
+        .auth-subtitle {
+            color: #cc0000;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #cc0000;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+        }
+
+        .form-hint {
+            display: block;
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .auth-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #cc0000, #990000);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #990000, #660000);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(204, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: #cc0000;
+            border: 2px solid #cc0000;
+        }
+
+        .btn-outline:hover {
+            background: #cc0000;
+            color: white;
+        }
+
+        .auth-footer {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .auth-status {
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-info {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        .auth-info i {
+            margin-right: 5px;
+            color: #cc0000;
+        }
+
+        .auth-info a {
+            color: #cc0000;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==================== ERROR MESSAGES ==================== */
+        .error-box {
+            background-color: #fadbd8;
+            color: #cc0000;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #cc0000;
+            display: none;
+        }
+
+        .error-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-box i {
+            margin-right: 10px;
+        }
+
+        /* ==================== PAGE SECTIONS ==================== */
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* ==================== CRUD SECTION ==================== */
+        .crud-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-top: 30px;
+            border-top: 5px solid #cc0000;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #cc0000;
+        }
+
+        .crud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .operation-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease;
+            border-top: 3px solid #cc0000;
+        }
+
+        .operation-card:hover {
+            transform: translateY(-5px);
+            border-color: #cc0000;
+            box-shadow: 0 10px 20px rgba(204, 0, 0, 0.1);
+        }
+
+        .operation-title {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .operation-title i {
+            color: #cc0000;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #5d6d7e;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #27ae60, #219653);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #cc0000, #990000);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #990000, #660000);
+        }
+
+        /* ==================== RESULTS SECTION ==================== */
+        .results-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: linear-gradient(135deg, #cc0000, #990000);
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* ==================== MAJOR BADGES ==================== */
+        .major-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 2px 0;
+        }
+        
+        .major-network {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .major-software {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .major-data {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+        
+        .gpa-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        /* ==================== STATUS MESSAGES ==================== */
+        .success {
+            color: #27ae60;
+            background-color: #d5f4e6;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .error {
+            color: #cc0000;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        /* ==================== FORMAT HELPER ==================== */
+        .format-hint {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 768px) {
+            .crud-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .auth-card, .crud-section {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .auth-title {
+                font-size: 22px;
+            }
+            
+            .auth-subtitle {
+                font-size: 18px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .auth-title {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            .auth-subtitle {
+                font-size: 16px;
+            }
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* ==================== CONFIGURATION PANEL ==================== */
+        .config-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .config-panel.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .config-header h3 {
+            color: #d35400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .config-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .config-label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .config-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .config-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Configuration Panel (Hidden by default) -->
+        <div id="configPanel" class="config-panel">
+            <div class="config-header">
+                <h3><i class="fas fa-cog"></i> Supabase Configuration</h3>
+                <button class="config-close" onclick="hideConfigPanel()">×</button>
+            </div>
+            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                Enter your Supabase credentials. They will be saved in your browser's local storage.
+            </p>
+            
+            <div class="config-input-group">
+                <label class="config-label">Supabase Project URL</label>
+                <input type="text" id="supabaseUrl" class="config-field" 
+                       placeholder="https://your-project.supabase.co">
+            </div>
+            
+            <div class="config-input-group">
+                <label class="config-label">Supabase Anon Key</label>
+                <input type="password" id="supabaseKey" class="config-field" 
+                       placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            
+            <div class="config-buttons">
+                <button onclick="saveConfig()" class="btn btn-success btn-small">
+                    <i class="fas fa-save"></i> Save Configuration
+                </button>
+                <button onclick="testConnection()" class="btn btn-primary btn-small">
+                    <i class="fas fa-plug"></i> Test Connection
+                </button>
+                <button onclick="resetConfig()" class="btn btn-outline btn-small">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+            
+            <div id="configStatus" style="margin-top: 15px; font-size: 13px;"></div>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-university"></i> AAU Student Management System</h1>
+            <p>Addis Ababa University - Distributed Database Management System Project</p>
+            <button onclick="showConfigPanel()" class="btn btn-outline" style="margin-top: 15px;">
+                <i class="fas fa-cog"></i> Configure Database Connection
+            </button>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="authSection" class="page-section active">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2 class="auth-title">
+                        <i class="fas fa-user-graduate"></i>
+                        AAU Student Portal
+                    </h2>
+                    <p class="auth-subtitle">Login to Access Dashboard</p>
+                </div>
+                
+                <!-- Error Message Container -->
+                <div id="loginError" class="error-box">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorMessage"></span>
+                </div>
+                
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> AAU Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            class="form-input"
+                            placeholder="your.name@aau.edu.et"
+                        >
+                        <small class="form-hint">Use your AAU email address registered in the system</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input"
+                            placeholder="Enter your password"
+                        >
+                        <small class="form-hint">Enter the password you created during registration</small>
+                    </div>
+                    
+                    <div class="auth-actions">
+                        <button id="loginBtn" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                    
+                    <div class="auth-footer">
+                        <p id="authStatus" class="auth-status">Please enter your credentials to continue</p>
+                        <p class="auth-info">
+                            <i class="fas fa-info-circle"></i>
+                            Contact system administrator if you don't have an account.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="page-section">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header" style="
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                margin-bottom: 30px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+                border-top: 5px solid #cc0000;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            ">
+                <div>
+                    <h2 style="color: #2c3e50; font-size: 28px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Student Dashboard
+                    </h2>
+                    <p style="color: #7f8c8d; margin: 0;">
+                        Welcome back, <span id="userEmail" style="color: #cc0000; font-weight: 600;"></span>
+                    </p>
+                </div>
+                <button id="logoutBtn" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <!-- CRUD Operations Section -->
+            <div class="crud-section">
+                <h2 class="section-title"><i class="fas fa-database"></i> Student Management</h2>
+                
+                <div class="crud-grid">
+                    <!-- Create Student -->
+                    <div class="operation-card">
+                        <h3 class="operation-title"><i class="fas fa-user-plus"></i> Add New Student</h3>
+                        <div class="input-group">
+                            <label for="studentId">Student ID</label>
+                            <input type="text" id="studentId" class="form-input" placeholder="GSE/0001/18 or GSE:0001:18">
+                            <small class="form-hint">Format: GSE/XXXX/18 (e.g., GSE/0001/18) or GSE:0001:18</small>
+                            <small class="format-hint">Both formats accepted: slashes (/) or colons (:)</small>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" class="form-input" placeholder="John">
+                            </div>
+                            <div class="input-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" class="form-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="fatherName">Father's Name</label>
+                            <input type="text" id="fatherName" class="form-input" placeholder="Michael">
+                        </div>
+                        <div class="input-group">
+                            <label for="studentEmail">Email</label>
+                            <input type="email" id="studentEmail" class="form-input" placeholder="john.doe@aau.edu.et">
+                        </div>
+                        <div class="input-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="+251911111111">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="hometown">Hometown</label>
+                                <input type="text" id="hometown" class="form-input" placeholder="Addis Ababa">
+                            </div>
+                            <div class="input-group">
+                                <label for="major">Major</label>
+                                <select id="major" class="form-select">
+                                    <option value="">Select Major</option>
+                                    <option value="Network & Security">Batch 1: Network & Security</option>
+                                    <option value="Software Engineering">Batch 2: Software Engineering</option>
+                                    <option value="Data & Web Engineering">Batch 3: Data & Web Engineering</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="gpa">GPA</label>
+                            <input type="number" id="gpa" class="form-input" placeholder="3.8" step="0.01" min="0" max="4.0">
+                            <small class="form-hint">Enter GPA between 0.0 and 4.0</small>
+                        </div>
+                        <button id="createStudentBtn" class="btn btn-success btn-small">
+                            <i class="fas fa-save"></i> Add Student
+                        </button>
+                    </div>
+
+                    <!-- Read/View Students -->
+                    <div class="operation-card">
+                        <h3 class="operation-title"><i class="fas fa-search"></i> View & Search Students</h3>
+                        <div class="input-group">
+                            <label>Load All Students</label>
+                            <button id="readStudentsBtn" class="btn btn-primary btn-small" style="width: 100%;">
+                                <i class="fas fa-users"></i> Load All Students
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <label for="searchId">Search by Student ID</label>
+                            <input type="text" id="searchId" class="form-input" placeholder="Enter Student ID (e.g., GSE/0001/18 or GSE:0001:18)">
+                            <small class="form-hint">Search by exact ID or partial match</small>
+                            <small class="format-hint">Accepts both GSE/XXXX/18 and GSE:XXXX:18 formats</small>
+                        </div>
+                        <button id="searchStudentBtn" class="btn btn-primary btn-small" style="width: 100%;">
+                            <i class="fas fa-search"></i> Search Student
+                        </button>
+                    </div>
+
+                    <!-- Update Student -->
+                    <div class="operation-card">
+                        <h3 class="operation-title"><i class="fas fa-edit"></i> Update Student</h3>
+                        <div class="input-group">
+                            <label for="updateId">Student ID to Update</label>
+                            <input type="text" id="updateId" class="form-input" placeholder="GSE/0001/18 or GSE:0001:18">
+                            <small class="format-hint">Format will be automatically converted to GSE/XXXX/18</small>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="updateGPA">Update GPA</label>
+                                <input type="number" id="updateGPA" class="form-input" placeholder="3.8" step="0.01" min="0" max="4.0">
+                            </div>
+                            <div class="input-group">
+                                <label for="updateMajor">Update Major</label>
+                                <select id="updateMajor" class="form-select">
+                                    <option value="">Select Major</option>
+                                    <option value="Network & Security">Network & Security</option>
+                                    <option value="Software Engineering">Software Engineering</option>
+                                    <option value="Data & Web Engineering">Data & Web Engineering</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="updateStudentBtn" class="btn btn-warning btn-small">
+                            <i class="fas fa-sync-alt"></i> Update Student
+                        </button>
+                    </div>
+
+                    <!-- Delete Student -->
+                    <div class="operation-card">
+                        <h3 class="operation-title"><i class="fas fa-trash-alt"></i> Delete Student</h3>
+                        <div class="input-group">
+                            <label for="deleteId">Student ID to Delete</label>
+                            <input type="text" id="deleteId" class="form-input" placeholder="Enter Student ID">
+                            <small class="format-hint">Accepts both GSE/XXXX/18 and GSE:XXXX:18 formats</small>
+                        </div>
+                        <button id="deleteStudentBtn" class="btn btn-danger btn-small">
+                            <i class="fas fa-trash"></i> Delete Student
+                        </button>
+                        <small class="form-hint">Warning: This action cannot be undone</small>
+                    </div>
+                </div>
+
+                <!-- Results Display Area -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <h3 class="section-title"><i class="fas fa-list"></i> Student Records</h3>
+                        <button id="clearResultsBtn" class="btn btn-outline btn-small">
+                            <i class="fas fa-times"></i> Clear Results
+                        </button>
+                    </div>
+                    <div id="resultsArea">
+                        <!-- Results will appear here -->
+                    </div>
+                    <div id="studentsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All JavaScript in one script tag -->
+    <script>
+        // ==================== CONFIGURATION MANAGEMENT ====================
+        let supabaseClient = null;
+        let configLoaded = false;
+
+        // Show configuration panel
+        function showConfigPanel() {
+            document.getElementById('configPanel').classList.add('show');
+            
+            // Load saved values if they exist
+            const savedUrl = localStorage.getItem('aau_supabase_url');
+            const savedKey = localStorage.getItem('aau_supabase_key');
+            
+            if (savedUrl) document.getElementById('supabaseUrl').value = savedUrl;
+            if (savedKey) document.getElementById('supabaseKey').value = savedKey;
+        }
+
+        // Hide configuration panel
+        function hideConfigPanel() {
+            document.getElementById('configPanel').classList.remove('show');
+        }
+
+        // Save configuration to localStorage
+        function saveConfig() {
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const key = document.getElementById('supabaseKey').value.trim();
+            
+            if (!url || !key) {
+                showConfigStatus('Please enter both URL and Key', 'error');
+                return;
+            }
+            
+            // Validate URL format
+            if (!url.startsWith('https://')) {
+                showConfigStatus('URL must start with https://', 'error');
+                return;
+            }
+            
+            // Validate key format (basic check)
+            if (!key.startsWith('eyJ')) {
+                showConfigStatus('Key should start with eyJ (JWT format)', 'warning');
+                // Continue anyway - might be a different format
+            }
+            
+            localStorage.setItem('aau_supabase_url', url);
+            localStorage.setItem('aau_supabase_key', key);
+            
+            showConfigStatus('Configuration saved successfully!', 'success');
+            
+            // Initialize Supabase with new credentials
+            setTimeout(() => {
+                initializeSupabase();
+                hideConfigPanel();
+            }, 1000);
+        }
+
+        // Reset configuration
+        function resetConfig() {
+            localStorage.removeItem('aau_supabase_url');
+            localStorage.removeItem('aau_supabase_key');
+            document.getElementById('supabaseUrl').value = '';
+            document.getElementById('supabaseKey').value = '';
+            supabaseClient = null;
+            configLoaded = false;
+            showConfigStatus('Configuration reset. Please enter new credentials.', 'info');
+        }
+
+        // Show status message in config panel
+        function showConfigStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('configStatus');
+            statusDiv.innerHTML = `
+                <div class="${type}" style="padding: 10px; border-radius: 5px; margin: 0;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                      type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // Auto-clear after 3 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 3000);
+            }
+        }
+
+        // Test database connection
+        async function testConnection() {
+            const url = document.getElementById('supabaseUrl').value.trim();
+            const key = document.getElementById('supabaseKey').value.trim();
+            
+            if (!url || !key) {
+                showConfigStatus('Please enter URL and Key first', 'error');
+                return;
+            }
+            
+            showConfigStatus('Testing connection...', 'info');
+            
+            try {
+                // Create temporary client for testing
+                const testClient = window.supabase.createClient(url, key);
+                
+                // Try to query the students table
+                const { data, error } = await testClient
+                    .from('students')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    if (error.message.includes('JWT')) {
+                        showConfigStatus('Invalid API key format', 'error');
+                    } else if (error.message.includes('Failed to fetch')) {
+                        showConfigStatus('Cannot connect to Supabase URL', 'error');
+                    } else if (error.message.includes('students')) {
+                        showConfigStatus('Connected! But students table may not exist', 'warning');
+                    } else {
+                        showConfigStatus(`Connection error: ${error.message}`, 'error');
+                    }
+                } else {
+                    showConfigStatus('✅ Successfully connected to Supabase!', 'success');
+                }
+            } catch (error) {
+                showConfigStatus(`Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== SUPABASE INITIALIZATION ====================
+        function initializeSupabase() {
+            const url = localStorage.getItem('aau_supabase_url');
+            const key = localStorage.getItem('aau_supabase_key');
+            
+            if (!url || !key) {
+                console.log('No Supabase credentials found. Please configure.');
+                showConfigPanel(); // Auto-show config if no credentials
+                return false;
+            }
+            
+            try {
+                supabaseClient = window.supabase.createClient(url, key);
+                configLoaded = true;
+                console.log('Supabase initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to initialize Supabase:', error);
+                showConfigPanel();
+                return false;
+            }
+        }
+
+        // ==================== HELPER FUNCTIONS ====================
+        function normalizeStudentId(studentId) {
+            if (!studentId) return '';
+            studentId = studentId.toString().trim().toUpperCase();
+            studentId = studentId.replace(/:/g, '/');
+            
+            if (studentId.startsWith('GSE')) {
+                studentId = studentId.replace(/[^A-Z0-9\/]/g, '');
+                
+                if (!studentId.includes('/')) {
+                    const match = studentId.match(/GSE(\d+)/);
+                    if (match && match[1]) {
+                        const numbers = match[1];
+                        if (numbers.length === 6) {
+                            studentId = `GSE/${numbers.substring(0, 4)}/${numbers.substring(4)}`;
+                        } else if (numbers.length === 4) {
+                            studentId = `GSE/${numbers}/18`;
+                        }
+                    }
+                }
+                
+                const parts = studentId.split('/');
+                if (parts.length >= 3) {
+                    if (parts[1] && parts[1].length < 4) {
+                        parts[1] = parts[1].padStart(4, '0');
+                    }
+                    if (parts[2] && parts[2].length < 2) {
+                        parts[2] = parts[2].padStart(2, '0');
+                    }
+                    studentId = parts.slice(0, 3).join('/');
+                }
+            }
+            
+            return studentId;
+        }
+        
+        function validateStudentId(studentId) {
+            if (!studentId) return false;
+            const normalized = normalizeStudentId(studentId);
+            return normalized.match(/^GSE\/\d{4}\/\d{2}$/);
+        }
+
+        // ==================== PAGE NAVIGATION ====================
+        function showAuthPage() {
+            document.getElementById('authSection').classList.add('active');
+            document.getElementById('dashboardSection').classList.remove('active');
+        }
+
+        function showDashboardPage(email) {
+            document.getElementById('authSection').classList.remove('active');
+            document.getElementById('dashboardSection').classList.add('active');
+            document.getElementById('userEmail').textContent = email;
+            hideLoginError();
+        }
+
+        // ==================== ERROR HANDLING ====================
+        function showLoginError(message) {
+            const errorBox = document.getElementById('loginError');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorBox.classList.add('show', 'shake');
+            setTimeout(() => errorBox.classList.remove('shake'), 500);
+        }
+
+        function hideLoginError() {
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        // ==================== AUTHENTICATION FUNCTIONS ====================
+        async function checkAuth() {
+            if (!configLoaded || !supabaseClient) {
+                if (!initializeSupabase()) return;
+            }
+            
+            try {
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                if (error) throw error;
+                
+                if (user) {
+                    console.log('User logged in:', user.email);
+                    showDashboardPage(user.email);
+                } else {
+                    showAuthPage();
+                }
+            } catch (error) {
+                console.log('Auth check:', error.message);
+                showAuthPage();
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showLoginError('Please enter both email and password');
+                return;
+            }
+            
+            showAuthMessage('Logging in...', 'info');
+            
+            try {
+                if (!configLoaded || !supabaseClient) {
+                    if (!initializeSupabase()) {
+                        showLoginError('Please configure database connection first');
+                        showConfigPanel();
+                        return;
+                    }
+                }
+                
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    if (error.message.includes('Invalid login credentials')) {
+                        showLoginError('Invalid email or password');
+                    } else if (error.message.includes('Email not confirmed')) {
+                        showLoginError('Please verify your email address');
+                    } else {
+                        showLoginError(`Login failed: ${error.message}`);
+                    }
+                    document.getElementById('password').value = '';
+                } else {
+                    console.log('Login successful');
+                    showDashboardPage(email);
+                    showResultMessage(`Welcome to AAU Student Portal, ${email}!`, 'success');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginError('An unexpected error occurred');
+            }
+        }
+
+        async function logout() {
+            showResultMessage('Logging out...', 'info');
+            try {
+                await supabaseClient.auth.signOut();
+                showAuthMessage('Successfully logged out', 'success');
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                clearResults();
+                showAuthPage();
+            } catch (error) {
+                console.error('Logout error:', error);
+                showResultMessage('Error during logout', 'error');
+            }
+        }
+
+        // ==================== CRUD OPERATIONS ====================
+        // [Keep all your existing CRUD functions exactly as they were]
+        // createStudent(), readStudents(), searchStudent(), updateStudent(), deleteStudent()
+        // displayStudentsTable(), showResultMessage(), clearResults(), etc.
+
+        // IMPORTANT: Copy all your existing JavaScript functions here
+        // from your previous HTML file starting from line where createStudent() begins
+        // to the end of the file
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AAU Student System Initializing...');
+            
+            // Initialize Supabase
+            initializeSupabase();
+            
+            // Setup event listeners
+            document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Check authentication status
+            setTimeout(() => checkAuth(), 500);
+            
+            // Setup CRUD event listeners (from your existing code)
+            // document.getElementById('createStudentBtn').addEventListener('click', createStudent);
+            // ... etc.
+        });
+
+        // Helper functions for auth messages
+        function showAuthMessage(message, type = 'info') {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.innerHTML = message;
+            authStatus.style.color = type === 'success' ? '#2ecc71' : 
+                                   type === 'error' ? '#cc0000' : '#3498db';
+            authStatus.style.backgroundColor = type === 'success' ? '#d5f4e6' : 
+                                             type === 'error' ? '#fadbd8' : '#e8f4fc';
+        }
+    </script>
+    
+    <!-- IMPORTANT: Copy all your remaining JavaScript functions here -->
+    <!-- Everything from your previous HTML's <script> tag that's not already above -->
+</body>
+</html>
