@@ -1209,13 +1209,444 @@
         }
 
         // ==================== CRUD OPERATIONS ====================
-        // [Keep all your existing CRUD functions exactly as they were]
-        // createStudent(), readStudents(), searchStudent(), updateStudent(), deleteStudent()
-        // displayStudentsTable(), showResultMessage(), clearResults(), etc.
+        async function createStudent() {
+            if (!supabaseClient) {
+                showResultMessage('Database connection error', 'error');
+                return;
+            }
+            
+            let studentId = document.getElementById('studentId').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const fatherName = document.getElementById('fatherName').value.trim();
+            const email = document.getElementById('studentEmail').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const hometown = document.getElementById('hometown').value.trim();
+            const major = document.getElementById('major').value.trim();
+            const gpa = parseFloat(document.getElementById('gpa').value);
+            
+            // Normalize student ID
+            studentId = normalizeStudentId(studentId);
+            
+            // Basic validation
+            if (!studentId || !firstName || !lastName || !email) {
+                showResultMessage('Please fill in required fields: Student ID, First Name, Last Name, Email', 'error');
+                return;
+            }
+            
+            // Validate Student ID format
+            if (!validateStudentId(studentId)) {
+                showResultMessage('Student ID must be in format: GSE/XXXX/XX (e.g., GSE/0001/18)', 'error');
+                return;
+            }
+            
+            // Validate email format
+            if (!email.includes('@aau.edu.et')) {
+                showResultMessage('Email must be AAU email address (@aau.edu.et)', 'error');
+                return;
+            }
+            
+            // Validate GPA
+            if (isNaN(gpa) || gpa < 0 || gpa > 4.0) {
+                showResultMessage('GPA must be between 0.0 and 4.0', 'error');
+                return;
+            }
+            
+            const studentData = {
+                student_id: studentId,
+                first_name: firstName,
+                last_name: lastName,
+                father_name: fatherName,
+                email: email,
+                phone: phone,
+                hometown: hometown,
+                major: major,
+                gpa: gpa
+            };
+            
+            showResultMessage(`Adding student ${studentId}...`, 'info');
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .insert([studentData]);
+                
+                if (error) {
+                    console.error('Create error:', error);
+                    
+                    if (error.message.includes('duplicate key')) {
+                        showResultMessage(`Student ID ${studentId} already exists!`, 'error');
+                    } else {
+                        showResultMessage(`Error creating student: ${error.message}`, 'error');
+                    }
+                } else {
+                    showResultMessage(`Student ${studentId} added successfully!`, 'success');
+                    
+                    // Clear form
+                    document.getElementById('studentId').value = '';
+                    document.getElementById('firstName').value = '';
+                    document.getElementById('lastName').value = '';
+                    document.getElementById('fatherName').value = '';
+                    document.getElementById('studentEmail').value = '';
+                    document.getElementById('phone').value = '';
+                    document.getElementById('hometown').value = '';
+                    document.getElementById('major').value = '';
+                    document.getElementById('gpa').value = '';
+                    
+                    // Refresh student list
+                    setTimeout(() => readStudents(), 500);
+                }
+            } catch (error) {
+                console.error('Create exception:', error);
+                showResultMessage('An unexpected error occurred while creating student', 'error');
+            }
+        }
+        
+        async function readStudents() {
+            if (!supabaseClient) {
+                showResultMessage('Database connection error', 'error');
+                return;
+            }
+            
+            showResultMessage('Loading students...', 'info');
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .order('student_id', { ascending: true });
+                
+                if (error) {
+                    console.error('Read error:', error);
+                    showResultMessage(`Error loading students: ${error.message}`, 'error');
+                    return;
+                }
+                
+                if (data.length === 0) {
+                    showResultMessage('No students found in database. Add some students first!', 'info');
+                    document.getElementById('studentsList').innerHTML = '';
+                    return;
+                }
+                
+                displayStudentsTable(data);
+                showResultMessage(`Loaded ${data.length} student(s) successfully`, 'success');
+            } catch (error) {
+                console.error('Read exception:', error);
+                showResultMessage('An unexpected error occurred while loading students', 'error');
+            }
+        }
+        
+        function displayStudentsTable(students) {
+            let html = `
+                <div class="success" style="margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i> Found ${students.length} student(s)
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Father's Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Hometown</th>
+                            <th>Major</th>
+                            <th>GPA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            students.forEach(student => {
+                // Determine major badge class
+                let majorBadgeClass = '';
+                if (student.major === 'Network & Security') majorBadgeClass = 'major-network';
+                else if (student.major === 'Software Engineering') majorBadgeClass = 'major-software';
+                else if (student.major === 'Data & Web Engineering') majorBadgeClass = 'major-data';
+                
+                html += `
+                    <tr>
+                        <td><strong>${student.student_id}</strong></td>
+                        <td>${student.first_name} ${student.last_name}</td>
+                        <td>${student.father_name || 'N/A'}</td>
+                        <td>${student.email}</td>
+                        <td>${student.phone || 'N/A'}</td>
+                        <td>${student.hometown || 'N/A'}</td>
+                        <td>
+                            ${student.major ? `<span class="major-badge ${majorBadgeClass}">${student.major}</span>` : 'Undeclared'}
+                        </td>
+                        <td>
+                            ${student.gpa ? `<span class="gpa-badge">${student.gpa.toFixed(2)}</span>` : 'N/A'}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            
+            document.getElementById('studentsList').innerHTML = html;
+        }
+        
+        async function searchStudent() {
+            if (!supabaseClient) {
+                showResultMessage('Database connection error', 'error');
+                return;
+            }
+            
+            let searchInput = document.getElementById('searchId').value.trim();
+            
+            if (!searchInput) {
+                showResultMessage('Please enter a Student ID to search', 'error');
+                return;
+            }
+            
+            // Normalize search input
+            const normalizedSearch = normalizeStudentId(searchInput);
+            
+            showResultMessage(`Searching for student ${searchInput}...`, 'info');
+            
+            try {
+                // Try exact match first
+                const { data: exactData, error: exactError } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('student_id', normalizedSearch);
+                
+                if (exactError) throw exactError;
+                
+                if (exactData && exactData.length > 0) {
+                    displayStudentsTable(exactData);
+                    showResultMessage(`Found exact match for ${normalizedSearch}`, 'success');
+                    return;
+                }
+                
+                // If no exact match, try partial match
+                const { data: partialData, error: partialError } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .ilike('student_id', `%${searchInput.replace(/:/g, '/').toUpperCase()}%`);
+                
+                if (partialError) throw partialError;
+                
+                if (partialData && partialData.length > 0) {
+                    displayStudentsTable(partialData);
+                    showResultMessage(`Found ${partialData.length} student(s) matching "${searchInput}"`, 'success');
+                } else {
+                    showResultMessage(`No students found matching "${searchInput}"`, 'error');
+                    document.getElementById('studentsList').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showResultMessage(`Error searching student: ${error.message}`, 'error');
+            }
+        }
+        
+        async function updateStudent() {
+            if (!supabaseClient) {
+                showResultMessage('Database connection error', 'error');
+                return;
+            }
+            
+            let studentId = document.getElementById('updateId').value.trim();
+            const newGPA = parseFloat(document.getElementById('updateGPA').value);
+            const newMajor = document.getElementById('updateMajor').value;
+            
+            if (!studentId) {
+                showResultMessage('Please enter a Student ID to update', 'error');
+                return;
+            }
+            
+            // Normalize student ID
+            studentId = normalizeStudentId(studentId);
+            
+            // Validate Student ID format
+            if (!validateStudentId(studentId)) {
+                showResultMessage(`Invalid Student ID format. Please use GSE/XXXX/XX format`, 'error');
+                return;
+            }
+            
+            // Prepare update data
+            const updateData = {};
+            
+            if (!isNaN(newGPA) && newGPA >= 0 && newGPA <= 4.0) {
+                updateData.gpa = newGPA;
+            }
+            
+            if (newMajor) {
+                updateData.major = newMajor;
+            }
+            
+            // Check if at least one field is provided
+            if (Object.keys(updateData).length === 0) {
+                showResultMessage('Please enter either a new GPA or select a new major to update', 'error');
+                return;
+            }
+            
+            showResultMessage(`Updating student ${studentId}...`, 'info');
+            
+            try {
+                // First check if student exists
+                const { data: checkData, error: checkError } = await supabaseClient
+                    .from('students')
+                    .select('student_id')
+                    .eq('student_id', studentId)
+                    .single();
+                
+                if (checkError || !checkData) {
+                    showResultMessage(`Student ${studentId} not found`, 'error');
+                    return;
+                }
+                
+                // Update the student
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .update(updateData)
+                    .eq('student_id', studentId);
+                
+                if (error) {
+                    console.error('Update error:', error);
+                    showResultMessage(`Error updating student: ${error.message}`, 'error');
+                } else {
+                    let updateMessage = `Student ${studentId} updated`;
+                    if (updateData.gpa) updateMessage += ` - GPA: ${newGPA.toFixed(2)}`;
+                    if (updateData.major) updateMessage += ` - Major: ${newMajor}`;
+                    showResultMessage(updateMessage, 'success');
+                    
+                    // Clear form
+                    document.getElementById('updateId').value = '';
+                    document.getElementById('updateGPA').value = '';
+                    document.getElementById('updateMajor').value = '';
+                    
+                    // Refresh student list
+                    setTimeout(() => readStudents(), 500);
+                }
+            } catch (error) {
+                console.error('Update exception:', error);
+                showResultMessage('An unexpected error occurred while updating student', 'error');
+            }
+        }
+        
+        async function deleteStudent() {
+            if (!supabaseClient) {
+                showResultMessage('Database connection error', 'error');
+                return;
+            }
+            
+            let studentId = document.getElementById('deleteId').value.trim();
+            
+            if (!studentId) {
+                showResultMessage('Please enter a Student ID to delete', 'error');
+                return;
+            }
+            
+            // Normalize student ID
+            studentId = normalizeStudentId(studentId);
+            
+            // Validate Student ID format
+            if (!validateStudentId(studentId)) {
+                showResultMessage(`Invalid Student ID format. Please use GSE/XXXX/XX format`, 'error');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete student ${studentId}? This action cannot be undone.`)) {
+                return;
+            }
+            
+            showResultMessage(`Deleting student ${studentId}...`, 'info');
+            
+            try {
+                // First check if student exists
+                const { data: checkData, error: checkError } = await supabaseClient
+                    .from('students')
+                    .select('student_id, first_name, last_name')
+                    .eq('student_id', studentId)
+                    .single();
+                
+                if (checkError || !checkData) {
+                    showResultMessage(`Student ${studentId} not found`, 'error');
+                    return;
+                }
+                
+                const studentName = `${checkData.first_name} ${checkData.last_name}`;
+                
+                // Delete the student
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .delete()
+                    .eq('student_id', studentId);
+                
+                if (error) {
+                    console.error('Delete error:', error);
+                    showResultMessage(`Error deleting student: ${error.message}`, 'error');
+                } else {
+                    showResultMessage(`Student ${studentId} (${studentName}) deleted successfully`, 'success');
+                    
+                    // Clear form
+                    document.getElementById('deleteId').value = '';
+                    
+                    // Refresh student list
+                    setTimeout(() => readStudents(), 500);
+                }
+            } catch (error) {
+                console.error('Delete exception:', error);
+                showResultMessage('An unexpected error occurred while deleting student', 'error');
+            }
+        }
+        
+        function showResultMessage(message, type = 'info') {
+            const resultsArea = document.getElementById('resultsArea');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'auth-status';
+            messageDiv.style.cssText = `
+                background-color: ${type === 'success' ? '#d5f4e6' : 
+                                 type === 'error' ? '#fadbd8' : '#e8f4fc'};
+                color: ${type === 'success' ? '#2ecc71' : 
+                        type === 'error' ? '#cc0000' : '#3498db'};
+                margin-bottom: 15px;
+                animation: fadeIn 0.5s ease;
+            `;
+            
+            messageDiv.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                              type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}" 
+                   style="margin-right: 10px;"></i>
+                ${message}
+            `;
+            
+            resultsArea.insertBefore(messageDiv, resultsArea.firstChild);
+            
+            // Auto-remove after 5 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.style.opacity = '0';
+                        messageDiv.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => {
+                            if (messageDiv.parentNode) {
+                                messageDiv.parentNode.removeChild(messageDiv);
+                            }
+                        }, 500);
+                    }
+                }, 5000);
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('studentsList').innerHTML = '';
+            document.getElementById('resultsArea').innerHTML = '';
+            showResultMessage('Results cleared', 'info');
+        }
 
-        // IMPORTANT: Copy all your existing JavaScript functions here
-        // from your previous HTML file starting from line where createStudent() begins
-        // to the end of the file
+        // Helper functions for auth messages
+        function showAuthMessage(message, type = 'info') {
+            const authStatus = document.getElementById('authStatus');
+            authStatus.innerHTML = message;
+            authStatus.style.color = type === 'success' ? '#2ecc71' : 
+                                   type === 'error' ? '#cc0000' : '#3498db';
+            authStatus.style.backgroundColor = type === 'success' ? '#d5f4e6' : 
+                                             type === 'error' ? '#fadbd8' : '#e8f4fc';
+        }
 
         // ==================== INITIALIZATION ====================
         document.addEventListener('DOMContentLoaded', function() {
@@ -1227,27 +1658,16 @@
             // Setup event listeners
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('createStudentBtn').addEventListener('click', createStudent);
+            document.getElementById('readStudentsBtn').addEventListener('click', readStudents);
+            document.getElementById('searchStudentBtn').addEventListener('click', searchStudent);
+            document.getElementById('updateStudentBtn').addEventListener('click', updateStudent);
+            document.getElementById('deleteStudentBtn').addEventListener('click', deleteStudent);
+            document.getElementById('clearResultsBtn').addEventListener('click', clearResults);
             
             // Check authentication status
             setTimeout(() => checkAuth(), 500);
-            
-            // Setup CRUD event listeners (from your existing code)
-            // document.getElementById('createStudentBtn').addEventListener('click', createStudent);
-            // ... etc.
         });
-
-        // Helper functions for auth messages
-        function showAuthMessage(message, type = 'info') {
-            const authStatus = document.getElementById('authStatus');
-            authStatus.innerHTML = message;
-            authStatus.style.color = type === 'success' ? '#2ecc71' : 
-                                   type === 'error' ? '#cc0000' : '#3498db';
-            authStatus.style.backgroundColor = type === 'success' ? '#d5f4e6' : 
-                                             type === 'error' ? '#fadbd8' : '#e8f4fc';
-        }
     </script>
-    
-    <!-- IMPORTANT: Copy all your remaining JavaScript functions here -->
-    <!-- Everything from your previous HTML's <script> tag that's not already above -->
 </body>
 </html>
